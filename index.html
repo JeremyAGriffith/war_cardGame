@@ -5,6 +5,10 @@
 	<title>War - Card Game</title>
 
 	<style type="text/css">
+		body{
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			background-color: #E5E5E5;
+		}
 		#draw:hover{
 			cursor:pointer
 		}
@@ -26,10 +30,12 @@
 			width: 40px;
 			height: 61px;
 			border: 1px solid #dddddd;
-			border-bottom: 2px solid #dddddd;
-			border-right: 2px solid #dddddd;
+			border-radius: 3px;
+			border-bottom: 2px solid #D9D9D9;
+			border-right: 2px solid #D9D9D9;
 			position: relative;
-			font-size: 12px;
+			font-size: 16px;
+			background-color: white;
 		}
 		.red{
 			color: red;
@@ -45,6 +51,10 @@
 		.bottom{
 			position: absolute;
 			bottom: 0;
+		}
+		.suit{
+			font-size: 32px;
+			margin: 10px 10px;
 		}
 	</style>
 
@@ -85,27 +95,32 @@
 				}
 				switch (card_suit){
 					case 1:
-						card_suit = "<3";
+						card_suit = "♥";
 						color = "red";
 						break;
 					case 2:
-						card_suit = "<>";
+						card_suit = "♦";
 						color = "red";
 						break;
 					case 3:
-						card_suit = "c8-";
+						card_suit = "♣";
 						color = "black";
 						break;
 					default:
-						card_suit = "-8>";
+						card_suit = "♠";
 						color = "black";
 						break;
 				}
 
 				return "<p class='left "+color+"'>"+card_num+"</p>"+
-						"<p class='right "+color+"'>"+card_suit+"</p>"+
-						"<p class='bottom left "+color+"'>"+card_suit+"</p>"+
+						"<p class='suit "+color+"'>"+card_suit+"</p>"+
 						"<p class='bottom right "+color+"'>"+card_num+"</p>";
+
+				// return "<p class='left "+color+"'>"+card_num+"</p>"+
+				// 		"<p class='right "+color+"'>"+card_suit+"</p>"+
+				// 		"<p class='suit "+color+"'>"+card_suit+"</p>"+
+				// 		"<p class='bottom left "+color+"'>"+card_suit+"</p>"+
+				// 		"<p class='bottom right "+color+"'>"+card_num+"</p>";
 			}
 		});
 	</script>
