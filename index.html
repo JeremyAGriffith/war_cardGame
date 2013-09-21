@@ -63,21 +63,140 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			$('#draw').disableSelection();
-			var score1 = 0, score2 = 0;
-			$("#draw").on('click', function(){
-				var p1 = Math.floor(Math.random()*13)+2, p2 = Math.floor(Math.random()*13)+2;
+			//var score1 = 0, score2 = 0;
 
-				$('#p1 .card').html(create_card(p1));
-				$('#p2 .card').html(create_card(p2));
 
-				p1 > p2 ? score1++ : score2++;
-				$('#p1 .score').text(score1);
-				$('#p2 .score').text(score2);
+			var player1 = new Player();
+			var player2 = new Player();
+			var auto = false;
+			var game_over = false;
+			deal_cards(player1, player2);
+
+			$('#auto').on('click', function(){
+				auto = auto ? false : true;
+				play_round();
 			});
 
-			function create_card(num) {
+			$("#draw").on('click', function(){
+				
+				if (!auto){
+					play_round();
+				}
+
+				// card1 = player1.draw_card();
+				// card2 = player2.draw_card();
+
+				// $('#p1 .card').html(create_card(card1.val, card1.suit));
+				// $('#p2 .card').html(create_card(card2.val, card2.suit));
+
+				// if (card1.val > card2.val){
+				// 	player1.add_card(card2);
+				// 	player1.add_card(card1);
+				// }else if (card1.val < card2.val){
+				// 	player2.add_card(card1);
+				// 	player2.add_card(card2);
+				// }else{
+				// 	// WARRRRRR
+				// 	console.log("war");
+				// 	player1.add_card(card1);
+				// 	player2.add_card(card2);
+				// }
+
+				// $('#p1 .score').text(player1.score);
+				// $('#p2 .score').text(player2.score);
+
+
+
+				// var p1 = Math.floor(Math.random()*13)+2, p2 = Math.floor(Math.random()*13)+2;
+
+				// $('#p1 .card').html(create_card(p1));
+				// $('#p2 .card').html(create_card(p2));
+
+				// p1 > p2 ? score1++ : score2++;
+				// $('#p1 .score').text(score1);
+				// $('#p2 .score').text(score2);
+			});
+
+			function play_round () {
+				do
+				{
+					card1 = player1.draw_card();
+					card2 = player2.draw_card();
+
+					$('#p1 .card').html(create_card(card1.val, card1.suit));
+					$('#p2 .card').html(create_card(card2.val, card2.suit));
+
+					if (card1.val > card2.val){
+						player1.add_card(card2);
+						player1.add_card(card1);
+					}else if (card1.val < card2.val){
+						player2.add_card(card1);
+						player2.add_card(card2);
+					}else{
+						// WARRRRRR
+						console.log("war");
+						player1.add_card(card1);
+						player2.add_card(card2);
+					}
+
+					$('#p1 .score').text(player1.score);
+					$('#p2 .score').text(player2.score);
+					console.log("p1="+player1.score+" p2="+player2.score);
+
+					if (player1.score == 0 || player2.score == 0){
+						game_over = true;
+						console.log("game over");
+					}
+				}
+				while (!game_over && auto);
+			}
+
+
+			function Player () {
+				this.score = 0;
+				this.deck = [];
+
+				this.draw_card = function(){
+					this.score--;
+					return this.deck.shift();
+				};
+				this.add_card = function(card){
+					this.deck.push(card);
+					this.score++;
+				};
+				// this.lose_card = function(card){
+				// 	this.deck.shift();
+				// 	this.score--;
+				// };
+			}
+
+			function Card (num) {
+				this.suit = Math.floor((num-1) / 13);
+				this.val = num - (13 * this.suit) + 1;
+			}
+
+			function deal_cards (p1, p2) {
+				var all_cards = [];
+				for (var i = 1; i <= 52; i++) {
+					all_cards.push(i);
+				};
+
+				var i = 1;
+				while (all_cards.length){
+					var card = Math.floor(Math.random() * all_cards.length);
+					all_cards.splice(card, 1);
+					card = new Card(card);
+					i>0 ? p1.add_card(card) : p2.add_card(card);
+					i *= -1;
+				}
+			}
+
+
+
+
+			function create_card(num, suit) {
 				var card_num, card_suit, color;
-				card_suit = Math.floor(Math.random()*4);
+				// card_suit = Math.floor(Math.random()*4);
 				switch (num){
 					case 14:
 						card_num = "A";
@@ -95,7 +214,7 @@
 						card_num = num;
 						break;
 				}
-				switch (card_suit){
+				switch (suit){
 					case 1:
 						card_suit = "♥";
 						color = "red";
@@ -130,6 +249,7 @@
 <body>
 	<h1>Lets Play War</h1>
 	<h3 id="draw">draw!!!</h3>
+	<p id="auto">auto</p>
 	<div id="p1">
 		<div class="card">
 		</div>
