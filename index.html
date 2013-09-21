@@ -120,23 +120,30 @@
 			function play_round () {
 				do
 				{
-					card1 = player1.draw_card();
-					card2 = player2.draw_card();
+					cards_in_play = [];
+					cards_in_play.push(player1.draw_card());
+					cards_in_play.push(player2.draw_card());
+					// card1 = player1.draw_card();
+					// card2 = player2.draw_card();
 
-					$('#p1 .card').html(create_card(card1.val, card1.suit));
-					$('#p2 .card').html(create_card(card2.val, card2.suit));
+					$('#p1 .card').html(create_card(cards_in_play[0].val, cards_in_play[0].suit));
+					$('#p2 .card').html(create_card(cards_in_play[1].val, cards_in_play[1].suit));
 
-					if (card1.val > card2.val){
-						player1.add_card(card2);
-						player1.add_card(card1);
-					}else if (card1.val < card2.val){
-						player2.add_card(card1);
-						player2.add_card(card2);
+					if (cards_in_play[0].val > cards_in_play[1].val){
+						player1.add_card(cards_in_play[1]);
+						player1.add_card(cards_in_play[0]);
+					}else if (cards_in_play[0].val < cards_in_play[1].val){
+						player2.add_card(cards_in_play[0]);
+						player2.add_card(cards_in_play[1]);
 					}else{
 						// WARRRRRR
 						console.log("war");
-						player1.add_card(card1);
-						player2.add_card(card2);
+
+						
+
+						
+						player1.add_card(cards_in_play[0]);
+						player2.add_card(cards_in_play[1]);
 					}
 
 					$('#p1 .score').text(player1.score);
