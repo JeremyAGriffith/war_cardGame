@@ -3,68 +3,20 @@
 <head>
 	<meta charset="UTF-8">
 	<title>War - Card Game</title>
+	
+	<!-- css -->
+	<link rel="stylesheet" type="text/css" href="assets/css/css.css" />
 
-	<style type="text/css">
-		body{
-			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-			background-color: #E5E5E5;
-		}
-		#draw:hover{
-			cursor:pointer
-		}
-		h3{
-			clear: both;
-			margin: 0 50px;
-		}
-		div{
-			padding: 0;
-			margin: 0;
-			margin-left: 10px;
-			float:left;
-		}
-		p{
-			margin: 0;
-			padding: 0;
-		}
-		.card{
-			width: 40px;
-			height: 61px;
-			border: 1px solid #dddddd;
-			border-radius: 3px;
-			border-bottom: 2px solid #D9D9D9;
-			border-right: 2px solid #D9D9D9;
-			position: relative;
-			font-size: 16px;
-			background-color: white;
-		}
-		.red{
-			color: red;
-		}
-		.left{
-			position: absolute;
-			left: 0;
-		}
-		.right{
-			position: absolute;
-			right: 0;
-		}
-		.bottom{
-			position: absolute;
-			bottom: 0;
-		}
-		.suit{
-			font-size: 32px;
-			margin: 10px 10px;
-		}
-	</style>
-
+	<!-- js -->
+	<!-- external -->
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+	<!-- mine -->
+	<script src="assets/js/war_objs.js"></script>
+	<!-- internal -->
 	<script type="text/javascript">
 		$(document).ready(function(){
 			$('#draw').disableSelection();
-			//var score1 = 0, score2 = 0;
-
 
 			var player1 = new Player();
 			var player2 = new Player();
@@ -74,51 +26,29 @@
 
 			$('#auto').on('click', function(){
 				auto = auto ? false : true;
-				play_round();
+				// play_round();
+				setInterval(function(){
+					clear_field();
+					// $('.field').html("");
+					play_round()
+				},200);
 			});
 
 			$("#draw").on('click', function(){
-				
 				if (!auto){
-					play_round();
+					// console.log("p1 "+player1.score+" p2 "+player2.score);
+					clear_field();
+					// $('.field').html("");
+					setTimeout(function(){
+						$('.field').html("");
+						play_round();
+					}, 500);
 				}
-
-				// card1 = player1.draw_card();
-				// card2 = player2.draw_card();
-
-				// $('#p1 .card').html(create_card(card1.val, card1.suit));
-				// $('#p2 .card').html(create_card(card2.val, card2.suit));
-
-				// if (card1.val > card2.val){
-				// 	player1.add_card(card2);
-				// 	player1.add_card(card1);
-				// }else if (card1.val < card2.val){
-				// 	player2.add_card(card1);
-				// 	player2.add_card(card2);
-				// }else{
-				// 	// WARRRRRR
-				// 	console.log("war");
-				// 	player1.add_card(card1);
-				// 	player2.add_card(card2);
-				// }
-
-				// $('#p1 .score').text(player1.score);
-				// $('#p2 .score').text(player2.score);
-
-
-
-				// var p1 = Math.floor(Math.random()*13)+2, p2 = Math.floor(Math.random()*13)+2;
-
-				// $('#p1 .card').html(create_card(p1));
-				// $('#p2 .card').html(create_card(p2));
-
-				// p1 > p2 ? score1++ : score2++;
-				// $('#p1 .score').text(score1);
-				// $('#p2 .score').text(score2);
 			});
 
 			function play_round () {
-				do
+				// do
+				if (!game_over)
 				{
 					var is_war = false;
 					var cards_in_play = [];
@@ -128,186 +58,125 @@
 						cards_in_play.push(player1.draw_card());
 						cards_in_play.push(player2.draw_card());
 						i+=2;
-						// card1 = player1.draw_card();
-						// card2 = player2.draw_card();
-						console.log(i);
-						$('#p1 .card').html(create_card(cards_in_play[i-2].val, cards_in_play[i-2].suit));
-						$('#p2 .card').html(create_card(cards_in_play[i-1].val, cards_in_play[i-1].suit));
-
+						// console.log(i);
+						$('#p1 .field').append(create_card(cards_in_play[i-2].val, cards_in_play[i-2].suit));
+						$('#p2 .field').append(create_card(cards_in_play[i-1].val, cards_in_play[i-1].suit));
 
 						if (cards_in_play[i-2].val == cards_in_play[i-1].val){
 							// WARRRRRR
-							console.log("war");
+							// console.log("war");
 							is_war = true;
 							var end = i + 5;
 							for (i; i <= end; i++){
-								cards_in_play.push(i<end-2 ? player1.draw_card() : player2.draw_card());
+								if (i<end-2){
+									if (player1.deck.length > 1){
+										cards_in_play.push(player1.draw_card());
+										blank_card("#p1");
+									}
+								}else{
+									if (player2.deck.length > 1){
+										cards_in_play.push(player2.draw_card());
+										blank_card("#p2");
+									}
+								}
+								// cards_in_play.push(i<end-2 ? player1.draw_card() : player2.draw_card());
+								// blank_card(i<end-2 ? "#p1" : "#p2");
 							}
+							i = cards_in_play.length;
 						}else{
 							is_war = false;
 							if (cards_in_play[i-2].val > cards_in_play[i-1].val){
 								divvy_loot(player1, cards_in_play);
-
-								// player1.add_card(cards_in_play[i-1]);
-								// player1.add_card(cards_in_play[i-2]);
+								$('#p1 .score').addClass("winner");
+								$('#p2 .score').removeClass("winner");
 							}else if (cards_in_play[i-2].val < cards_in_play[i-1].val){
 								divvy_loot(player2, cards_in_play);
-
-								// player2.add_card(cards_in_play[i-2]);
-								// player2.add_card(cards_in_play[i-1]);
+								$('#p2 .score').addClass("winner");
+								$('#p1 .score').removeClass("winner");
 							}
 						}
 					}
 					while (is_war);
 
-
-
-					// if (cards_in_play[0].val > cards_in_play[1].val){
-					// 	player1.add_card(cards_in_play[1]);
-					// 	player1.add_card(cards_in_play[0]);
-					// }else if (cards_in_play[0].val < cards_in_play[1].val){
-					// 	player2.add_card(cards_in_play[0]);
-					// 	player2.add_card(cards_in_play[1]);
-					// }else{
-					// 	// WARRRRRR
-					// 	console.log("war");
-
-					// 	player1.add_card(cards_in_play[0]);
-					// 	player2.add_card(cards_in_play[1]);
-					// }
-
-					$('#p1 .score').text(player1.score);
-					$('#p2 .score').text(player2.score);
-					console.log("p1="+player1.score+" p2="+player2.score);
+					display_scores();
+					// console.log("p1="+player1.score+" p2="+player2.score);
 
 					if (player1.score == 0 || player2.score == 0){
 						game_over = true;
-						console.log("game over");
+						$('h1').after("<h3>"+(player1.score ? "Player 1" : "Player 2")+" is the winner</h3>");
+						// console.log("game over");
 					}
 				}
-				while (!game_over && auto);
+				// while (!game_over);
 			}
-
 
 			function divvy_loot (player, cards) {
 				for (var c in cards){
-					// console.log("divvy "+cards[c].val);
-					// console.log("divvy "+c.val);
-					// console.log(cards[c]);
 					player.add_card(cards[c]);
 				}
 				cards = null;
 			}
 
-
-			function Player () {
-				this.score = 0;
-				this.deck = [];
-
-				this.draw_card = function(){
-					console.log("val "+this.deck[0].val);
-					this.score--;
-					return this.deck.shift();
-				};
-				this.add_card = function(card){
-					this.deck.push(card);
-					this.score++;
-				};
-				// this.lose_card = function(card){
-				// 	this.deck.shift();
-				// 	this.score--;
-				// };
-			}
-
-			function Card (num) {
-				this.suit = Math.floor((num-1) / 13);
-				this.val = num - (13 * this.suit) + 1;
-			}
-
 			function deal_cards (p1, p2) {
 				var all_cards = [];
-				for (var i = 1; i <= 52; i++) {
-					all_cards.push(i);
+				for (var card_num = 1; card_num <= 52; card_num++) {
+					all_cards.push(card_num);
 				};
 
-				var i = 1;
+				var p_index = 1;
 				while (all_cards.length){
 					var card = Math.floor(Math.random() * all_cards.length);
 					card = all_cards.splice(card, 1);
 					card = new Card(card);
-					console.log(card);
-					i>0 ? p1.add_card(card) : p2.add_card(card);
-					i *= -1;
+					// console.log(card);
+					p_index>0 ? p1.add_card(card) : p2.add_card(card);
+					p_index *= -1;
 				}
+				display_scores();
 			}
 
+			function display_scores() {
+				$('#p1 .score').text(player1.score);
+				$('#p2 .score').text(player2.score);
+			}
 
-
-
-			function create_card(num, suit) {
-				var card_num, card_suit, color;
-				// card_suit = Math.floor(Math.random()*4);
-				switch (num){
-					case 14:
-						card_num = "A";
-						break;
-					case 11:
-						card_num = "J";
-						break;
-					case 12:
-						card_num = "Q";
-						break;
-					case 13:
-						card_num = "K";
-						break;
-					default:
-						card_num = num;
-						break;
+			function clear_field() {
+				if ($('#p1 h2').hasClass("winner")){
+					$('#p1 .field').children().animate({
+						opacity: "0.25",
+						left: "-=25"
+					}, 500);
+					$('#p2 .field').children().animate({
+						opacity: "0.25",
+						top: "-=25"
+					}, 500);
+				}else{
+					$('#p2 .field').children().animate({
+						opacity: "0.25",
+						left: "-=25"
+					}, 500);
+					$('#p1 .field').children().animate({
+						opacity: "0.25",
+						bottom: "-=25"
+					}, 500);
 				}
-				switch (suit){
-					case 1:
-						card_suit = "♥";
-						color = "red";
-						break;
-					case 2:
-						card_suit = "♦";
-						color = "red";
-						break;
-					case 3:
-						card_suit = "♣";
-						color = "black";
-						break;
-					default:
-						card_suit = "♠";
-						color = "black";
-						break;
-				}
-
-				return "<p class='left "+color+"'>"+card_num+"</p>"+
-						"<p class='suit "+color+"'>"+card_suit+"</p>"+
-						"<p class='bottom right "+color+"'>"+card_num+"</p>";
-
-				// return "<p class='left "+color+"'>"+card_num+"</p>"+
-				// 		"<p class='right "+color+"'>"+card_suit+"</p>"+
-				// 		"<p class='suit "+color+"'>"+card_suit+"</p>"+
-				// 		"<p class='bottom left "+color+"'>"+card_suit+"</p>"+
-				// 		"<p class='bottom right "+color+"'>"+card_num+"</p>";
 			}
 		});
 	</script>
 </head>
 <body>
-	<h1>Lets Play War</h1>
-	<h3 id="draw">draw!!!</h3>
-	<p id="auto">auto</p>
+	<h1 id="auto">Let's Play War</h1>
+	<!-- <h3 id="draw">draw!!!</h3> -->
 	<div id="p1">
-		<div class="card">
-		</div>
 		<h2 class="score"></h2>
+		<div class="deck"></div>
+		<div class="field"></div>
 	</div>
+	<h3 id="draw">draw!!!</h3>
 	<div id="p2">
-		<div class="card"></div>
 		<h2 class="score"></h2>
+		<div class="deck"></div>
+		<div class="field"></div>
 	</div>
 </body>
 </html>
