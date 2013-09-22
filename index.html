@@ -120,31 +120,61 @@
 			function play_round () {
 				do
 				{
-					cards_in_play = [];
-					cards_in_play.push(player1.draw_card());
-					cards_in_play.push(player2.draw_card());
-					// card1 = player1.draw_card();
-					// card2 = player2.draw_card();
+					var is_war = false;
+					var cards_in_play = [];
+					var i = 0;
+					do
+					{
+						cards_in_play.push(player1.draw_card());
+						cards_in_play.push(player2.draw_card());
+						i+=2;
+						// card1 = player1.draw_card();
+						// card2 = player2.draw_card();
+						console.log(i);
+						$('#p1 .card').html(create_card(cards_in_play[i-2].val, cards_in_play[i-2].suit));
+						$('#p2 .card').html(create_card(cards_in_play[i-1].val, cards_in_play[i-1].suit));
 
-					$('#p1 .card').html(create_card(cards_in_play[0].val, cards_in_play[0].suit));
-					$('#p2 .card').html(create_card(cards_in_play[1].val, cards_in_play[1].suit));
 
-					if (cards_in_play[0].val > cards_in_play[1].val){
-						player1.add_card(cards_in_play[1]);
-						player1.add_card(cards_in_play[0]);
-					}else if (cards_in_play[0].val < cards_in_play[1].val){
-						player2.add_card(cards_in_play[0]);
-						player2.add_card(cards_in_play[1]);
-					}else{
-						// WARRRRRR
-						console.log("war");
+						if (cards_in_play[i-2].val == cards_in_play[i-1].val){
+							// WARRRRRR
+							console.log("war");
+							is_war = true;
+							var end = i + 5;
+							for (i; i <= end; i++){
+								cards_in_play.push(i<end-2 ? player1.draw_card() : player2.draw_card());
+							}
+						}else{
+							is_war = false;
+							if (cards_in_play[i-2].val > cards_in_play[i-1].val){
+								divvy_loot(player1, cards_in_play);
 
-						
+								// player1.add_card(cards_in_play[i-1]);
+								// player1.add_card(cards_in_play[i-2]);
+							}else if (cards_in_play[i-2].val < cards_in_play[i-1].val){
+								divvy_loot(player2, cards_in_play);
 
-						
-						player1.add_card(cards_in_play[0]);
-						player2.add_card(cards_in_play[1]);
+								// player2.add_card(cards_in_play[i-2]);
+								// player2.add_card(cards_in_play[i-1]);
+							}
+						}
 					}
+					while (is_war);
+
+
+
+					// if (cards_in_play[0].val > cards_in_play[1].val){
+					// 	player1.add_card(cards_in_play[1]);
+					// 	player1.add_card(cards_in_play[0]);
+					// }else if (cards_in_play[0].val < cards_in_play[1].val){
+					// 	player2.add_card(cards_in_play[0]);
+					// 	player2.add_card(cards_in_play[1]);
+					// }else{
+					// 	// WARRRRRR
+					// 	console.log("war");
+
+					// 	player1.add_card(cards_in_play[0]);
+					// 	player2.add_card(cards_in_play[1]);
+					// }
 
 					$('#p1 .score').text(player1.score);
 					$('#p2 .score').text(player2.score);
@@ -159,11 +189,23 @@
 			}
 
 
+			function divvy_loot (player, cards) {
+				for (var c in cards){
+					// console.log("divvy "+cards[c].val);
+					// console.log("divvy "+c.val);
+					// console.log(cards[c]);
+					player.add_card(cards[c]);
+				}
+				cards = null;
+			}
+
+
 			function Player () {
 				this.score = 0;
 				this.deck = [];
 
 				this.draw_card = function(){
+					console.log("val "+this.deck[0].val);
 					this.score--;
 					return this.deck.shift();
 				};
@@ -191,8 +233,9 @@
 				var i = 1;
 				while (all_cards.length){
 					var card = Math.floor(Math.random() * all_cards.length);
-					all_cards.splice(card, 1);
+					card = all_cards.splice(card, 1);
 					card = new Card(card);
+					console.log(card);
 					i>0 ? p1.add_card(card) : p2.add_card(card);
 					i *= -1;
 				}
